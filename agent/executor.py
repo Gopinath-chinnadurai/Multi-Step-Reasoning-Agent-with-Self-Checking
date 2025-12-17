@@ -7,7 +7,6 @@ def executor(question: str, plan: list = None):
     """
     question_lower = question.lower()
 
-    # --- 1. Time difference (train, journey, arrival/departure) ---
     times = re.findall(r'(\d{1,2}):(\d{2})', question)
     if len(times) == 2 and any(k in question_lower for k in ["train", "journey", "arrives", "leaves"]):
         sh, sm = map(int, times[0])
@@ -24,7 +23,6 @@ def executor(question: str, plan: list = None):
             "intermediate": intermediate
         }
 
-    # --- 2. Arithmetic problems ---
     numbers = list(map(int, re.findall(r'\d+', question)))
     if numbers:
         total = None
@@ -57,7 +55,6 @@ def executor(question: str, plan: list = None):
                 "intermediate": intermediate
             }
 
-    # --- 3. Meeting slots / duration problems ---
     duration_match = re.search(r'(\d+)\s*minutes', question_lower)
     slots = re.findall(r'(\d{1,2}:\d{2})[–-](\d{1,2}:\d{2})', question)
     if duration_match and slots:
@@ -78,7 +75,7 @@ def executor(question: str, plan: list = None):
             "intermediate": intermediate
         }
 
-    # --- 4. Fallback ---
+  
     return {
         "final_answer": "Unable to solve this question",
         "raw_value": 0,
