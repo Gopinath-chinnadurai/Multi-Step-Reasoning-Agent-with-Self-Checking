@@ -19,13 +19,13 @@ class AgentLoop:
         verification = {}
 
         while retries <= self.max_retries:
-            # 1️⃣ Generate plan
+            #  Generate plan
             plan = planner(question)
 
-            # 2️⃣ Execute plan
+            #  Execute plan
             solution = executor(question, plan)
 
-            # 3️⃣ Verify solution
+            #  Verify solution
             verification = verifier(solution)
 
             # Debug logging (optional)
@@ -33,7 +33,7 @@ class AgentLoop:
             print(f"[Retry {retries}] Solution: {solution['final_answer']}")
             print(f"[Retry {retries}] Verification: {verification['passed']}")
             
-            # ✅ If verification passed, return success JSON
+            #  If verification passed, return success JSON
             if verification["passed"]:
                 return {
                     "answer": solution["final_answer"],
@@ -49,7 +49,7 @@ class AgentLoop:
 
             retries += 1
 
-        # ❌ Failed after retries
+        #  Failed after retries
         return {
             "answer": "Failed to solve the problem",
             "status": "failed",
