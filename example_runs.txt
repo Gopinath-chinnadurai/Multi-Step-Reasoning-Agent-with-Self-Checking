@@ -1,0 +1,88 @@
+==================== Example Run 1 ====================
+Input:
+8 + 7
+
+Output:
+{
+  "answer": "15",
+  "status": "success",
+  "retries": 0
+}
+
+-------------------------------------------------------
+
+==================== Example Run 2 ====================
+Input:
+10 + 20 - 5
+
+Output:
+{
+  "answer": "25",
+  "status": "success",
+  "retries": 0
+}
+
+-------------------------------------------------------
+
+==================== Example Run 3 ====================
+Input:
+Alice has 3 red apples and twice as many green apples. How many apples does she have in total?
+
+Output:
+{
+  "answer": "9 apples",
+  "status": "success",
+  "retries": 0
+}
+
+-------------------------------------------------------
+
+==================== Example Run 4 ====================
+Input:
+If a train leaves at 14:30 and arrives at 18:05, how long is the journey?
+
+Output:
+{
+  "answer": "3 hours 35 minutes",
+  "status": "success",
+  "retries": 0
+}
+
+-------------------------------------------------------
+
+==================== Example Run 5 ====================
+Input:
+A meeting needs 60 minutes. There are free slots: 09:00–09:30, 09:45–10:30, 11:00–12:00. Which slots can fit the meeting?
+
+Output:
+{
+  "answer": "11:00–12:00",
+  "status": "success",
+  "retries": 0
+}
+
+-------------------------------------------------------
+
+==================== Example Run 6 ====================
+Input:
+If a train leaves at 23:50 and arrives at 00:20, how long is the journey?
+
+Output:
+{
+  "answer": "0 hours 30 minutes",
+  "status": "success",
+  "retries": 1
+}
+
+-------------------------------------------------------
+
+==================== Example Run 7 ====================
+Input:
+10 + 20 - 33 * 2
+
+Output:
+{
+  "answer": "-36",
+  "status": "success",
+  "retries": 0
+}

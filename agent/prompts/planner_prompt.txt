@@ -1,0 +1,25 @@
+prompt = f"""
+You are a planning agent.
+
+Task:
+Given a word problem, output a concise step-by-step plan.
+Do NOT solve the problem.
+
+Output format:
+Return a JSON list of steps.
+Example:
+["Parse the question", "Extract quantities", "Compute result", "Format answer"]
+
+Examples:
+
+Q: Alice has 3 red apples and twice as many green apples. How many apples total?
+Plan:
+["Extract number of red apples", "Compute green apples", "Add totals"]
+
+Q: A train leaves at 14:30 and arrives at 18:05. How long is the journey?
+Plan:
+["Extract start time", "Extract end time", "Compute time difference"]
+
+Now generate a plan for this question:
+{question}
+"""
