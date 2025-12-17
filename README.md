@@ -4,7 +4,19 @@ This project implements a multi-step reasoning agent that solves structured math
 
 - **A final answer**  
 - **A short, user-facing explanation**  
-- **Debug metadata** (plan, checks, retries) for internal evaluation  
+- **Debug metadata** (plan, checks, retries) for internal evaluation
+
+**Note:** The current implementation fully handles four main problem types:
+
+- Arithmetic / logic problems (e.g., 8 + 7, 10 * 5, sum of 3 and 4)
+
+- Number sequences (e.g., 2, 4, 8, 16, _)
+
+- Time differences (e.g., Train leaves 14:30, arrives 18:05)
+
+- Meeting durations / available slots (e.g., Meeting 46 minutes, slots 09:00–09:30, 11:00–12:00)
+
+If needed, the executor.py logic can be extended to handle additional problem types such as letter sequences, odd-one-out, and directional/walking problems.
 
 ---
 
