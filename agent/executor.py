@@ -1,9 +1,10 @@
 import re
+from collections import Counter
 
 def executor(question: str, plan: list = None):
     """
     Execute the plan or solve the question directly.
-    Returns final_answer, raw_value (numeric), and intermediate info.
+    Returns final_answer, raw_value (numeric if applicable), and intermediate info.
     """
     question_lower = question.lower()
 
@@ -47,7 +48,6 @@ def executor(question: str, plan: list = None):
                 product *= n
             total = product
             intermediate = f"Numbers={numbers}, Product={total}"
-
         if total is not None:
             return {
                 "final_answer": str(total),
@@ -60,14 +60,12 @@ def executor(question: str, plan: list = None):
     if duration_match and slots:
         duration = int(duration_match.group(1))
         valid = []
-
         for start, end in slots:
             sh, sm = map(int, start.split(":"))
             eh, em = map(int, end.split(":"))
             slot_duration = (eh*60 + em) - (sh*60 + sm)
             if slot_duration >= duration:
                 valid.append(f"{start}–{end}")
-
         intermediate = f"Meeting duration={duration} min, Valid slots={valid}"
         return {
             "final_answer": ", ".join(valid) if valid else "No slots fit",
@@ -75,7 +73,40 @@ def executor(question: str, plan: list = None):
             "intermediate": intermediate
         }
 
-  
+    if ',' in question:
+        items = re.findall(r'\d+', question)
+        if len(items) >= 2:
+            nums = list(map(int, items))
+        
+            diff = nums[1] - nums[0]
+            if all(nums[i+1] - nums[i] == diff for i in range(len(nums)-1)):
+                next_num = nums[-1] + diff
+                return {
+                    "final_answer": str(next_num),
+                    "raw_value": next_num,
+                    "intermediate": f"Arithmetic sequence detected: diff={diff}, Next={next_num}"
+                }
+            
+            ratio = nums[1] / nums[0]
+            if all(nums[i+1] / nums[i] == ratio for i in range(len(nums)-1)):
+                next_num = int(nums[-1] * ratio)
+                return {
+                    "final_answer": str(next_num),
+                    "raw_value": next_num,
+                    "intermediate": f"Geometric sequence detected: ratio={ratio}, Next={next_num}"
+                }
+
+        words = [w.strip().lower() for w in question.split(',')]
+        if len(words) >= 3 and not any(w.isdigit() for w in words):
+            counter = Counter(words)
+            
+            odd_one = min(counter, key=counter.get)
+            return {
+                "final_answer": odd_one,
+                "raw_value": None,
+                "intermediate": f"Odd one out detected among {words}: {odd_one}"
+            }
+
     return {
         "final_answer": "Unable to solve this question",
         "raw_value": 0,
