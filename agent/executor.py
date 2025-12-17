@@ -1,22 +1,25 @@
 import re
-from collections import Counter
 
 def executor(question: str, plan: list = None):
     """
     Execute the plan or solve the question directly.
-    Returns final_answer, raw_value (numeric if applicable), and intermediate info.
+    Returns:
+        - final_answer: user-facing answer
+        - raw_value: numeric if applicable
+        - intermediate: string showing calculation steps
     """
     question_lower = question.lower()
 
+    # --- 1. Time difference (train, journey, arrival/departure) ---
     times = re.findall(r'(\d{1,2}):(\d{2})', question)
     if len(times) == 2 and any(k in question_lower for k in ["train", "journey", "arrives", "leaves"]):
         sh, sm = map(int, times[0])
         eh, em = map(int, times[1])
-        start = sh * 60 + sm
-        end = eh * 60 + em
+        start = sh*60 + sm
+        end = eh*60 + em
         diff = end - start
         if diff < 0:
-            diff += 24 * 60
+            diff += 24*60
         intermediate = f"Start={start} min, End={end} min, Duration={diff} min"
         return {
             "final_answer": f"{diff//60} hours {diff%60} minutes",
@@ -24,17 +27,18 @@ def executor(question: str, plan: list = None):
             "intermediate": intermediate
         }
 
+    # --- 2. Arithmetic problems ---
     numbers = list(map(int, re.findall(r'\d+', question)))
     if numbers:
         total = None
         intermediate = ""
         if "twice" in question_lower:
             base = numbers[0]
-            total = base + base * 2
+            total = base + base*2
             intermediate = f"Base={base}, Twice={base*2}, Total={total}"
         elif "half" in question_lower:
             base = numbers[0]
-            total = base / 2
+            total = base/2
             intermediate = f"Base={base}, Half={total}"
         elif "sum" in question_lower or "+" in question_lower:
             total = sum(numbers)
@@ -42,12 +46,13 @@ def executor(question: str, plan: list = None):
         elif "difference" in question_lower or "-" in question_lower:
             total = numbers[0] - sum(numbers[1:])
             intermediate = f"Numbers={numbers}, Difference={total}"
-        elif "product" in question_lower or "times" in question_lower:
+        elif "product" in question_lower or "times" in question_lower or "*" in question_lower:
             product = 1
             for n in numbers:
                 product *= n
             total = product
             intermediate = f"Numbers={numbers}, Product={total}"
+
         if total is not None:
             return {
                 "final_answer": str(total),
@@ -55,17 +60,20 @@ def executor(question: str, plan: list = None):
                 "intermediate": intermediate
             }
 
+    # --- 3. Meeting slots / duration problems ---
     duration_match = re.search(r'(\d+)\s*minutes', question_lower)
     slots = re.findall(r'(\d{1,2}:\d{2})[–-](\d{1,2}:\d{2})', question)
     if duration_match and slots:
         duration = int(duration_match.group(1))
         valid = []
+
         for start, end in slots:
             sh, sm = map(int, start.split(":"))
             eh, em = map(int, end.split(":"))
             slot_duration = (eh*60 + em) - (sh*60 + sm)
             if slot_duration >= duration:
                 valid.append(f"{start}–{end}")
+
         intermediate = f"Meeting duration={duration} min, Valid slots={valid}"
         return {
             "final_answer": ", ".join(valid) if valid else "No slots fit",
@@ -73,42 +81,33 @@ def executor(question: str, plan: list = None):
             "intermediate": intermediate
         }
 
-    if ',' in question:
-        items = re.findall(r'\d+', question)
-        if len(items) >= 2:
-            nums = list(map(int, items))
-        
-            diff = nums[1] - nums[0]
-            if all(nums[i+1] - nums[i] == diff for i in range(len(nums)-1)):
-                next_num = nums[-1] + diff
+    # --- 4. Number sequences (arithmetic/geometric) ---
+    seq_match = re.findall(r'([\d,]+).*[_?]', question)
+    if seq_match:
+        nums = list(map(int, re.findall(r'\d+', seq_match[0])))
+        if len(nums) >= 2:
+            diffs = [nums[i+1]-nums[i] for i in range(len(nums)-1)]
+            ratios = [nums[i+1]/nums[i] for i in range(len(nums)-1) if nums[i]!=0]
+            if all(d == diffs[0] for d in diffs):
+                next_val = nums[-1] + diffs[0]
+                intermediate = f"Sequence={nums}, Arithmetic diff={diffs[0]}, Next={next_val}"
                 return {
-                    "final_answer": str(next_num),
-                    "raw_value": next_num,
-                    "intermediate": f"Arithmetic sequence detected: diff={diff}, Next={next_num}"
+                    "final_answer": str(next_val),
+                    "raw_value": next_val,
+                    "intermediate": intermediate
                 }
-            
-            ratio = nums[1] / nums[0]
-            if all(nums[i+1] / nums[i] == ratio for i in range(len(nums)-1)):
-                next_num = int(nums[-1] * ratio)
+            elif len(ratios)>0 and all(r == ratios[0] for r in ratios):
+                next_val = int(nums[-1]*ratios[0])
+                intermediate = f"Sequence={nums}, Geometric ratio={ratios[0]}, Next={next_val}"
                 return {
-                    "final_answer": str(next_num),
-                    "raw_value": next_num,
-                    "intermediate": f"Geometric sequence detected: ratio={ratio}, Next={next_num}"
+                    "final_answer": str(next_val),
+                    "raw_value": next_val,
+                    "intermediate": intermediate
                 }
 
-        words = [w.strip().lower() for w in question.split(',')]
-        if len(words) >= 3 and not any(w.isdigit() for w in words):
-            counter = Counter(words)
-            
-            odd_one = min(counter, key=counter.get)
-            return {
-                "final_answer": odd_one,
-                "raw_value": None,
-                "intermediate": f"Odd one out detected among {words}: {odd_one}"
-            }
-
+    # --- 5. Fallback ---
     return {
         "final_answer": "Unable to solve this question",
-        "raw_value": 0,
+        "raw_value": None,
         "intermediate": "No valid calculation found"
     }
