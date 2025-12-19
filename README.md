@@ -16,6 +16,10 @@ This project implements a multi-step reasoning agent that solves structured math
 
 - Meeting durations / available slots (e.g., Meeting 46 minutes, slots 09:00–09:30, 11:00–12:00)
 
+<img width="1031" height="875" alt="Multistepreasoning" src="https://github.com/user-attachments/assets/259fda21-c417-414e-bdc6-139856485b43" />
+
+**Demo :** https://multi-step-reasoning-app.streamlit.app/
+
 If needed, the executor.py logic can be extended to handle additional problem types such as letter sequences, odd-one-out, and directional/walking problems.
 
 ---
